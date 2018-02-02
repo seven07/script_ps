@@ -11,39 +11,53 @@ echo "\r\n";
 
 // global predefined parameters
 $user_login = 'ipmadmin';
-$CUST_REST_IPAM_URL = '10.0.93.5';
+$CUST_REST_IPAM_URL = '10.0.97.15';
 
 //get SOLIDSERVER version 
 
-$service_url = 'https://'.$CUST_REST_IPAM_URL.'rest/member_list/WHERE/member_is_me%3D1';
+$service_url = 'https://'.$CUST_REST_IPAM_URL.'/rest/member_list/WHERE/member_is_me%3D1';
 $member = rest_call ($service_url);
-$version = $member->member_version;
 
+$version = $member[0]->member_version;
+$split = explode(".",$version);
+$branch = $split[0];
 
-$file = 'counters-'.$member->member_version.'-'.date(dmYHi).'.txt';
+$file = 'counters-'.$version.'-'.date(dmYHi).'.txt';
 file_put_contents($file, "Your architecture contains:\n");
 
 
-$services = array (
+//$services = array();
 //"IPAM"
-"cnt_space" => array ("/rest/ip_site_count/", " space(s)\n"),
+$i=0;
+$services[$i] = array("/rest/ip_site_count/", " space(s)\n");$i++;
 
-//IPAM v4
-"cnt_block" => array ("/rest/ip_block_count/", " block(s)"),
-"cnt_subnet" => array ("/rest/ip_subnet_count/", " subnet(s)"),
-"cnt_addr" => array("/rest/ip_address_count/WHERE/ip_id%3E0", " used addresse(s), empty result means that there is no subnet\n"),
+//IPAM IPv4
+if($branch < 6){
+	$services[$i] = array("/rest/ip_block_count/", " block(s)");$i++;
+	$services[$i] = array("/rest/ip_subnet_count/", " subnet(s)");$i++;
+	$services[$i] = array("/rest/ip_address_count/WHERE/ip_id%3E0", " used addresse(s), empty result means that there is no subnet\n");$i++;
+}else{
+	$services[$i] = array("/rest/ip_block_subnet_count/", " network(s)");$i++;
+	$services[$i] = array("/rest/ip_address_count/", " used addresse(s), empty result means that there is no subnet\n");$i++;
+}
 
-//IPAM v6
-"cnt_block6" => array ("/rest/ip6_block6_count/", " IPv6 block(s)"),
-"cnt_subnet6" => array ("/rest/ip6_subnet6_count/", " IPv6 subnet(s)"),
-"cnt_addr6" => array("/rest/ip6_address6_count/WHERE/ip_id%3E0", " used IPv6 addresse(s), empty result means that there is no subnet\n"),
+//IPAM IPv6
+if($branch < 6){
+	$services[$i] = array("/rest/ip6_block6_count/", " IPv6 block(s)");$i++;
+	$services[$i] = array("/rest/ip6_subnet6_count/", " IPv6 subnet(s)");$i++;
+	$services[$i] = array("/rest/ip6_address6_count/WHERE/ip_id%3E0", " used IPv6 addresse(s), empty result means that there is no subnet\n");$i++;
+}else{
+	$services[$i] = array("/rest/ip6_block6_subnet6_count/", " IPv6 network(s)");$i++;
+	$services[$i] = array("/rest/ip6_address6_count/", " used IPv6 addresse(s), empty result means that there is no subnet\n");$i++;
+}
 
 
 //DNS
-
+$services[$i] = array("/rest/dns_server_count/", " DNS server(s)");$i++;
 
 //DHCP 
-//"cnt_dhcp_server" => array ("/rest/dhcp_server_count/", " DHCP server(s)"),
+$services[$i] = array("/rest/dhcp_server_count/", " DHCP server(s)");$i++;
+//$services[$i] = array("/rest/dhcp_server_list/WHERE/vdhcp_parent_id%3D0", " Smart or standalone server(s)");$i++;
 //"cnt_dhcp_group" => array ("/rest/dhcp_group_count/", " DHCP group(s)"),
 
 //"cnt_dhcp_server6" => array ("/rest/dhcp6_server6_count/", " DHCP IPv6 server(s)"),
@@ -51,16 +65,15 @@ $services = array (
 
 
 //Netchange
-"cnt_netchange_device" => array ("/rest/iplnetdev_count/", " Device(s) via Netchange"),
-"cnt_netchange_vlan" => array ("/rest/iplnetdevvlan_count/", " VLAN(s) via Netchange"),
-"cnt_netchange_port" => array ("/rest/iplport_count/", " Port(s) via Netchange"),
-"cnt_netchange_items" => array ("/rest/ipldev_count/", " item(s) via Netchange\n"),
+$services[$i] = array("/rest/iplnetdev_count/", " Device(s) via Netchange");$i++;
+$services[$i] = array("/rest/iplnetdevvlan_count/", " VLAN(s) via Netchange");$i++;
+$services[$i] = array("/rest/iplport_count/", " Port(s) via Netchange");$i++;
+$services[$i] = array("/rest/ipldev_count/", " item(s) via Netchange\n");$i++;
 
 //VLAN Manager
-"cnt_vlan_domain" => array ("/rest/vlmdomain_count/", "  Vlan Domain(s)"),
-"cnt_vlan_range" => array ("/rest/vlmrange_count/", "  Vlan Range(s)"),
-"cnt_vlan_vlan" => array ("/rest/vlmvlan_count/WHERE/vlmvlan_name%20is%20not%20null", " used vlan(s)\n"),
-);
+$services[$i] = array("/rest/vlmdomain_count/", "  Vlan Domain(s)");$i++;
+$services[$i] = array("/rest/vlmrange_count/", "  Vlan Range(s)");$i++;
+$services[$i] = array("/rest/vlmvlan_count/WHERE/vlmvlan_name%20is%20not%20null", " used vlan(s)\n");$i++;
 
 
 //count objects

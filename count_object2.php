@@ -1,9 +1,6 @@
 <?php
 
 // script to count the object
-$file = 'counters.txt';
-file_put_contents($file, "Your architecture contains:\n");
-
 
 echo "User: ipmadmin\r\n";
 echo "Password: ";
@@ -23,11 +20,40 @@ $member = rest_call ($service_url);
 $version = $member->member_version;
 
 
+$file = 'counters-'.$member->member_version.'-'.date(dmYHi).'.txt';
+file_put_contents($file, "Your architecture contains:\n");
+
+
 $services = array (
-"cnt_space" => array ("/rest/ip_site_count/", " space(s)", "IPAM"),
-"cnt_block" => array ("/rest/ip_block_count/", " block(s)", "IPAM"),
-"cnt_subnet" => array ("/rest/ip_subnet_count/", " subnet(s)", "IPAM" ),
-"cnt_addr" => array("/rest/ip_address_count/", " addresse(s)", "IPAM")
+//"IPAM"
+"cnt_space" => array ("/rest/ip_site_count/", " space(s)"),
+
+//IPAM v4
+"cnt_block" => array ("/rest/ip_block_count/", " block(s)"),
+"cnt_subnet" => array ("/rest/ip_subnet_count/", " subnet(s)"),
+"cnt_addr" => array("/rest/ip_address_count/WHERE/oid>0", " addresse(s)"),
+
+//IPAM v6
+
+//DNS
+
+
+//DHCP 
+//"cnt_dhcp_server" => array ("/rest/dhcp_server_count/", " DHCP server(s)"),
+//"cnt_dhcp_group" => array ("/rest/dhcp_group_count/", " DHCP group(s)"),
+
+//"cnt_dhcp_server6" => array ("/rest/dhcp6_server6_count/", " DHCP IPv6 server(s)"),
+//"cnt_dhcp_group6" => array ("/rest/dhcp6_group6_count/", " DHCP IPv6 group(s)"),
+
+
+//Netchange
+"cnt_netchange_" => array ("/rest/iplnetdev_count/", " Netchange Device(s)"),
+
+
+
+//VLAN Manager
+
+"cnt_server" => array ("/rest/")
 );
 
 

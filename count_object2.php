@@ -13,7 +13,7 @@ echo "\r\n";
 $user_login = 'ipmadmin';
 $CUST_REST_IPAM_URL = '10.0.93.5';
 
-//get the major version 
+//get SOLIDSERVER version 
 
 $service_url = 'https://'.$CUST_REST_IPAM_URL.'rest/member_list/WHERE/member_is_me%3D1';
 $member = rest_call ($service_url);
@@ -26,14 +26,18 @@ file_put_contents($file, "Your architecture contains:\n");
 
 $services = array (
 //"IPAM"
-"cnt_space" => array ("/rest/ip_site_count/", " space(s)"),
+"cnt_space" => array ("/rest/ip_site_count/", " space(s)\n"),
 
 //IPAM v4
 "cnt_block" => array ("/rest/ip_block_count/", " block(s)"),
 "cnt_subnet" => array ("/rest/ip_subnet_count/", " subnet(s)"),
-"cnt_addr" => array("/rest/ip_address_count/WHERE/oid>0", " addresse(s)"),
+"cnt_addr" => array("/rest/ip_address_count/WHERE/ip_id%3E0", " used addresse(s), empty result means that there is no subnet\n"),
 
 //IPAM v6
+"cnt_block6" => array ("/rest/ip6_block6_count/", " IPv6 block(s)"),
+"cnt_subnet6" => array ("/rest/ip6_subnet6_count/", " IPv6 subnet(s)"),
+"cnt_addr6" => array("/rest/ip6_address6_count/WHERE/ip_id%3E0", " used IPv6 addresse(s), empty result means that there is no subnet\n"),
+
 
 //DNS
 
@@ -47,13 +51,15 @@ $services = array (
 
 
 //Netchange
-"cnt_netchange_" => array ("/rest/iplnetdev_count/", " Netchange Device(s)"),
-
-
+"cnt_netchange_device" => array ("/rest/iplnetdev_count/", " Device(s) via Netchange"),
+"cnt_netchange_vlan" => array ("/rest/iplnetdevvlan_count/", " VLAN(s) via Netchange"),
+"cnt_netchange_port" => array ("/rest/iplport_count/", " Port(s) via Netchange"),
+"cnt_netchange_items" => array ("/rest/ipldev_count/", " item(s) via Netchange\n"),
 
 //VLAN Manager
-
-"cnt_server" => array ("/rest/")
+"cnt_vlan_domain" => array ("/rest/vlmdomain_count/", "  Vlan Domain(s)"),
+"cnt_vlan_range" => array ("/rest/vlmrange_count/", "  Vlan Range(s)"),
+"cnt_vlan_vlan" => array ("/rest/vlmvlan_count/WHERE/vlmvlan_name%20is%20not%20null", " used vlan(s)\n"),
 );
 
 
@@ -69,6 +75,7 @@ file_put_contents($file, $count_str ,FILE_APPEND);
 
 }
 
+system ("cat ".$file);
 
 function rest_call ($service_url) {
 

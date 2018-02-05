@@ -11,7 +11,7 @@ echo "\r\n";
 
 // global predefined parameters
 $user_login = 'ipmadmin';
-$CUST_REST_IPAM_URL = '10.0.97.15';
+$CUST_REST_IPAM_URL = '10.0.93.51';
 
 //get SOLIDSERVER version 
 
@@ -32,37 +32,66 @@ $i=0;
 $services[$i] = array("/rest/ip_site_count/", " space(s)\n");$i++;
 
 //IPAM IPv4
-if($branch < 6){
-	$services[$i] = array("/rest/ip_block_count/", " block(s)");$i++;
-	$services[$i] = array("/rest/ip_subnet_count/", " subnet(s)");$i++;
-	$services[$i] = array("/rest/ip_address_count/WHERE/ip_id%3E0", " used addresse(s), empty result means that there is no subnet\n");$i++;
-}else{
-	$services[$i] = array("/rest/ip_block_subnet_count/", " network(s)");$i++;
-	$services[$i] = array("/rest/ip_address_count/", " used addresse(s), empty result means that there is no subnet\n");$i++;
+if($branch < 6)
+    {
+        $services[$i] = array("/rest/ip_block_count/", " block(s)");$i++;
+        $services[$i] = array("/rest/ip_subnet_count/", " subnet(s)");$i++;
+        $services[$i] = array("/rest/ip_address_count/WHERE/ip_id%3E0", " used addresse(s), empty result means that there is no subnet\n");$i++;
+    }
+else
+{
+        $services[$i] = array("/rest/ip_block_subnet_count/", " network(s)");$i++;
+        $services[$i] = array("/rest/ip_address_count/", " used addresse(s), empty result means that there is no subnet\n");$i++;
 }
 
 //IPAM IPv6
-if($branch < 6){
-	$services[$i] = array("/rest/ip6_block6_count/", " IPv6 block(s)");$i++;
-	$services[$i] = array("/rest/ip6_subnet6_count/", " IPv6 subnet(s)");$i++;
-	$services[$i] = array("/rest/ip6_address6_count/WHERE/ip_id%3E0", " used IPv6 addresse(s), empty result means that there is no subnet\n");$i++;
-}else{
-	$services[$i] = array("/rest/ip6_block6_subnet6_count/", " IPv6 network(s)");$i++;
-	$services[$i] = array("/rest/ip6_address6_count/", " used IPv6 addresse(s), empty result means that there is no subnet\n");$i++;
-}
+if($branch < 6)
+    {
+        $services[$i] = array("/rest/ip6_block6_count/", " IPv6 block(s)");$i++;
+        $services[$i] = array("/rest/ip6_subnet6_count/", " IPv6 subnet(s)");$i++;
+        $services[$i] = array("/rest/ip6_address6_count/WHERE/ip_id%3E0", " used IPv6 addresse(s), empty result means that there is no subnet\n");$i++;
+    }
+else
+    {
+        $services[$i] = array("/rest/ip6_block6_subnet6_count/", " IPv6 network(s)");$i++;
+        $services[$i] = array("/rest/ip6_address6_count/", " used IPv6 addresse(s), empty result means that there is no subnet\n");$i++;
+    }
 
 
 //DNS
 $services[$i] = array("/rest/dns_server_count/", " DNS server(s)");$i++;
+$services[$i] = array("/rest/dns_server_count/WHERE/vdns_parent_id%3D0", " DNS Smart or standalone server(s)");$i++;
+$partial_url = "/rest/dns_server_list/WHERE/vdns_parent_id%3D0";
+$service_url = 'https://'.$CUST_REST_IPAM_URL.$partial_url;
+$dns_servers = rest_call ($service_url);
+    var_dump($dns_servers);
+$nb_parent_dns = sizeof($dns_servers);
+$j = $nb_parent_dns-1;
+while($j >= 0)
+    {
+        $services[$i] = array("/rest/dns_view_count/WHERE/dns_id%3D".$dns_servers[$j]->dns_id, "  DNS view(s) in ".$dns_servers[$j]->dns_name);$i++;
+        $services[$i] = array("/rest/dns_zone_count/WHERE/dns_id%3D".$dns_servers[$j]->dns_id, " DNS zone(s) in ".$dns_servers[$j]->dns_name);$i++;
+        $services[$i] = array("/rest/dns_rr_count/WHERE/dns_id%3D".$dns_servers[$j]->dns_id, " DNS resource records(s) in ".$dns_servers[$j]->dns_name."\n");$i++;
+        $j--;
+    }
 
+    
+    
 //DHCP 
 $services[$i] = array("/rest/dhcp_server_count/", " DHCP server(s)");$i++;
-//$services[$i] = array("/rest/dhcp_server_list/WHERE/vdhcp_parent_id%3D0", " Smart or standalone server(s)");$i++;
-//"cnt_dhcp_group" => array ("/rest/dhcp_group_count/", " DHCP group(s)"),
-
-//"cnt_dhcp_server6" => array ("/rest/dhcp6_server6_count/", " DHCP IPv6 server(s)"),
-//"cnt_dhcp_group6" => array ("/rest/dhcp6_group6_count/", " DHCP IPv6 group(s)"),
-
+$services[$i] = array("/rest/dhcp_server_count/WHERE/vdhcp_parent_id%3D0", " DHCP Smart or standalone server(s)");$i++;
+$partial_url = "/rest/dhcp_server_list/WHERE/vdhcp_parent_id%3D0";
+$service_url = 'https://'.$CUST_REST_IPAM_URL.$partial_url;
+$dhcp_servers = rest_call ($service_url);
+$nb_parent_dhcp = sizeof($dhcp_servers);
+$j = $nb_parent_dhcp-1;
+while($j >= 0)
+    {
+        $services[$i] = array("/rest/dhcp_scope_count/WHERE/dhcp_id%3D".$dhcp_servers[$j]->dhcp_id, " DHCP scope(s) in ".$dhcp_servers[$j]->dhcp_name);$i++;
+        $services[$i] = array("/rest/dhcp_group_count/WHERE/dhcp_id%3D".$dhcp_servers[$j]->dhcp_id, " DHCP group(s) in ".$dhcp_servers[$j]->dhcp_name);$i++;
+        $services[$i] = array("/rest/dhcp_static_count/WHERE/dhcp_id%3D".$dhcp_servers[$j]->dhcp_id, " DHCP statics(s) in ".$dhcp_servers[$j]->dhcp_name."\n");$i++;
+        $j--;
+    }
 
 //Netchange
 $services[$i] = array("/rest/iplnetdev_count/", " Device(s) via Netchange");$i++;
@@ -81,11 +110,11 @@ foreach ($services as $n){
 $partial_url = $n[0];
 $obj_desc = $n[1];
 
+    
 $service_url = 'https://'.$CUST_REST_IPAM_URL.$partial_url;
 $count_out = rest_call ($service_url);
 $count_str =$count_out[0]->total.$obj_desc."\n";
 file_put_contents($file, $count_str ,FILE_APPEND);
-
 }
 
 system ("cat ".$file);

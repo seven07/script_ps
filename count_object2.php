@@ -14,8 +14,9 @@ $user_login = 'ipmadmin';
 
 if(file_exists("/SOLIDSERVERSION"))
     {
-        
+        if($argv[1] == NULL)
         $CUST_REST_IPAM_URL = '127.0.0.1';
+        $CUST_REST_IPAM_URL = $argv[1];
         $service_url = 'https://'.$CUST_REST_IPAM_URL.'/rest/member_list/WHERE/member_is_me%3D1';
         $member = rest_call ($service_url);
         $version = $member[0]->member_version;
@@ -23,7 +24,8 @@ if(file_exists("/SOLIDSERVERSION"))
     }
 else
     {
-        $CUST_REST_IPAM_URL = '10.0.93.51';
+        //$CUST_REST_IPAM_URL = '10.0.97.15';
+        $CUST_REST_IPAM_URL = $argv[1];
         $service_url = 'https://'.$CUST_REST_IPAM_URL.'/rest/member_list/WHERE/member_is_me%3D1';
         $member = rest_call ($service_url);
         $version = $member[0]->member_version;

@@ -11,19 +11,33 @@ echo "\r\n";
 
 // global predefined parameters
 $user_login = 'ipmadmin';
-$CUST_REST_IPAM_URL = '127.0.0.1';
 
-//get SOLIDSERVER version 
-
-$service_url = 'https://'.$CUST_REST_IPAM_URL.'/rest/member_list/WHERE/member_is_me%3D1';
-$member = rest_call ($service_url);
-
-$version = $member[0]->member_version;
+if(file_exists("/SOLIDSERVERSION"))
+    {
+        
+        $CUST_REST_IPAM_URL = '127.0.0.1';
+        $service_url = 'https://'.$CUST_REST_IPAM_URL.'/rest/member_list/WHERE/member_is_me%3D1';
+        $member = rest_call ($service_url);
+        $version = $member[0]->member_version;
+        $file = '/data1/exports/counters-'.$version.'-'.date(dmYHi).'.txt';
+    }
+else
+    {
+        $CUST_REST_IPAM_URL = '10.0.93.51';
+        $service_url = 'https://'.$CUST_REST_IPAM_URL.'/rest/member_list/WHERE/member_is_me%3D1';
+        $member = rest_call ($service_url);
+        $version = $member[0]->member_version;
+        $file = 'counters-'.$version.'-'.date(dmYHi).'.txt';
+    }
+        
+file_put_contents($file, "Your architecture contains:\n");
+//get SOLIDSERVER version
+//$service_url = 'https://'.$CUST_REST_IPAM_URL.'/rest/member_list/WHERE/member_is_me%3D1';
+//$member = rest_call ($service_url);
+    
+//$version = $member[0]->member_version;
 $split = explode(".",$version);
 $branch = $split[0];
-
-$file = 'counters-'.$version.'-'.date(dmYHi).'.txt';
-file_put_contents($file, "Your architecture contains:\n");
 
 
 //$services = array();
@@ -68,7 +82,7 @@ $nb_parent_dns = sizeof($dns_servers);
 $j = $nb_parent_dns-1;
 while($j >= 0)
     {
-        $services[$i] = array("/rest/dns_view_count/WHERE/dns_id%3D".$dns_servers[$j]->dns_id, "  DNS view(s) in ".$dns_servers[$j]->dns_name);$i++;
+        $services[$i] = array("/rest/dns_view_count/WHERE/dns_id%3D".$dns_servers[$j]->dns_id, " DNS view(s) in ".$dns_servers[$j]->dns_name);$i++;
         $services[$i] = array("/rest/dns_zone_count/WHERE/dns_id%3D".$dns_servers[$j]->dns_id, " DNS zone(s) in ".$dns_servers[$j]->dns_name);$i++;
         $services[$i] = array("/rest/dns_rr_count/WHERE/dns_id%3D".$dns_servers[$j]->dns_id, " DNS resource records(s) in ".$dns_servers[$j]->dns_name."\n");$i++;
         $j--;
@@ -88,7 +102,7 @@ while($j >= 0)
     {
         $services[$i] = array("/rest/dhcp_scope_count/WHERE/dhcp_id%3D".$dhcp_servers[$j]->dhcp_id, " DHCP scope(s) in ".$dhcp_servers[$j]->dhcp_name);$i++;
         $services[$i] = array("/rest/dhcp_group_count/WHERE/dhcp_id%3D".$dhcp_servers[$j]->dhcp_id, " DHCP group(s) in ".$dhcp_servers[$j]->dhcp_name);$i++;
-        $services[$i] = array("/rest/dhcp_static_count/WHERE/dhcp_id%3D".$dhcp_servers[$j]->dhcp_id, " DHCP statics(s) in ".$dhcp_servers[$j]->dhcp_name."\n");$i++;
+        $services[$i] = array("/rest/dhcp_static_count/WHERE/dhcp_id%3D".$dhcp_servers[$j]->dhcp_id, " DHCP static(s) in ".$dhcp_servers[$j]->dhcp_name."\n");$i++;
         $j--;
     }
 
@@ -115,8 +129,11 @@ $count_out = rest_call ($service_url);
 $count_str =$count_out[0]->total.$obj_desc."\n";
 file_put_contents($file, $count_str ,FILE_APPEND);
 }
+if(file_exists("/SOLIDSERVERSION"))
+system ("cat /data/exports/".$file);
 
 system ("cat ".$file);
+    
 
 function rest_call ($service_url) {
 

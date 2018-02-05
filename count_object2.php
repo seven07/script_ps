@@ -11,7 +11,7 @@ echo "\r\n";
 
 // global predefined parameters
 $user_login = 'ipmadmin';
-$CUST_REST_IPAM_URL = '10.0.93.51';
+$CUST_REST_IPAM_URL = '127.0.0.1';
 
 //get SOLIDSERVER version 
 
@@ -64,7 +64,6 @@ $services[$i] = array("/rest/dns_server_count/WHERE/vdns_parent_id%3D0", " DNS S
 $partial_url = "/rest/dns_server_list/WHERE/vdns_parent_id%3D0";
 $service_url = 'https://'.$CUST_REST_IPAM_URL.$partial_url;
 $dns_servers = rest_call ($service_url);
-    var_dump($dns_servers);
 $nb_parent_dns = sizeof($dns_servers);
 $j = $nb_parent_dns-1;
 while($j >= 0)

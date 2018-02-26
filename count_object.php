@@ -1,6 +1,7 @@
 <?php
 
 // script to count the object
+// Test GSI GIT 2
 
 echo "User: ipmadmin\r\n";
 echo "Password: ";

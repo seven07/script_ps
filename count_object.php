@@ -1,7 +1,10 @@
 <?php
 
 // script to count the object
+<<<<<<< HEAD
 // Test GSI GIT 2
+=======
+>>>>>>> parent of aaa2fa7... Just a GIT test
 
 echo "User: ipmadmin\r\n";
 echo "Password: ";

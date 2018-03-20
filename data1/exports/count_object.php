@@ -80,7 +80,7 @@ date_default_timezone_set('UTC');
 if(file_exists("/SOLIDSERVERVERSION"))
     {
         if($argv[1] == NULL)
-	{	
+	{
         	$CUST_REST_IPAM_URL = '127.0.0.1';
 	}
 	else
@@ -102,7 +102,7 @@ else
     }
 
 file_put_contents($file, "\nYour configuration contains:\n\n");
-    
+
 //$version = $member[0]->member_version;
 $split = explode(".",$version);
 $branch = $split[0];
@@ -117,7 +117,7 @@ $i++;
 if($branch < 6)
     {
         $services[$i] = array("/rest/ip_block_count/", "block(s)", 'IPAMv4');
-	$i++;
+	      $i++;
         $services[$i] = array("/rest/ip_subnet_count/", "subnet(s)", 'IPAMv4');
 	$i++;
 	$services[$i] = array("/rest/ip_block_subnet_count/", "block(s)/subnet(s)", 'IPAMv4');
@@ -129,11 +129,11 @@ if($branch < 6)
     }
 else
     {
-        $services[$i] = array("/rest/ip_block_subnet_count/", "network(s)", 'IPAMv6');
+        $services[$i] = array("/rest/ip_block_subnet_count/", "network(s)", 'IPAMv4');
 	$i++;
-	$services[$i] = array("/rest/ip_pool_count/", "pool(s)", 'IPAMv6');
+	$services[$i] = array("/rest/ip_pool_count/", "pool(s)", 'IPAMv4');
 	$i++;
-        $services[$i] = array("/rest/ip_address_count/WHERE/ip_id%3E0", "used addresse(s), empty result means that there is no subnet\n", 'IPAMv6');
+        $services[$i] = array("/rest/ip_address_count/WHERE/ip_id%3E0", "used addresse(s), empty result means that there is no subnet\n", 'IPAMv4');
 	$i++;
     }
 
@@ -184,7 +184,7 @@ while($j >= 0)
         $i++;
         $services[$i] = array("/rest/dns_rr_count/WHERE/dns_id%3D".$dns_servers[$j]->dns_id, "DNS resource records(s)\n", 'DNS');
         $i++;
-	
+
 	$k = $nb_rr_type-1;
 	while ($k >= 0)
 	      {
@@ -196,8 +196,8 @@ while($j >= 0)
 	$i++;
 	$j--;
     }
-    
-//DHCP 
+
+//DHCP
 $services[$i] = array("/rest/dhcp_server_count/", "DHCP server(s)", 'DHCP');
 $i++;
 $services[$i] = array("/rest/dhcp_server_count/WHERE/vdhcp_parent_id%3D0", "DHCP Smart or standalone server(s)", 'DHCP');
@@ -257,7 +257,7 @@ foreach ($services as $n)
 	$obj_desc = $n[1];
 	$obj_type = $n[2];
 
-    
+
 	$service_url = 'https://'.$CUST_REST_IPAM_URL.$partial_url;
 	$count_out = rest_call ($service_url);
 

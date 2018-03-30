@@ -117,7 +117,7 @@ $i++;
 if($branch < 6)
     {
         //level 0 does not take into account the vlsm block
-        $services[$i] = array("/rest/ip_block_count/WHERE/block_level%3D0", "block(s)", 'IPAMv4');
+        $services[$i] = array("/rest/ip_block_count/WHERE/real_hidden_site%3D0", "block(s)", 'IPAMv4');
 	      $i++;
         $services[$i] = array("/rest/ip_subnet_count/", "subnet(s)", 'IPAMv4');
 	$i++;
@@ -141,7 +141,7 @@ else
 //IPAM IPv6
 if($branch < 6)
     {
-        $services[$i] = array("/rest/ip6_block6_count/WHERE/block_level%3D0", "IPv6 block(s)",'IPAMv6');
+        $services[$i] = array("/rest/ip6_block6_count/WHERE/real_hidden_site%3D0", "IPv6 block(s)",'IPAMv6');
 	$i++;
         $services[$i] = array("/rest/ip6_subnet6_count/", "IPv6 subnet(s)",'IPAMv6');
 	$i++;
